@@ -1,56 +1,105 @@
-# Welcome to your Expo app 👋
+# Roam: Airbnb-style mobile app with AI agents
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Roam is an Expo React Native rental app. Guests describe a stay in one sentence ("quiet pet friendly cabin with a hot tub under $300 a night") and get ranked stays back. They can also ask booking and policy questions about a stay, answered word for word from Roam's own content.
 
-## Get started
+> **Status: early build.** The design system, onboarding, and email-code auth with Clerk are done. Search, stay details, and policy answers come next.
 
-1. Install dependencies
+## What works today
 
-   ```bash
-   npm install
-   ```
+- **Design system:** Satoshi type, color/spacing/radius tokens, and 20 shared components (buttons, fields, chips, listing and policy cards, tab bar, and more). A dev-only `/design-system` route shows all of them.
+- **Onboarding:** a swipeable intro shown to signed-out users.
+- **Auth with Clerk, no passwords:**
+  - Sign up with name and email, then confirm with a 6-digit code sent by email.
+  - Sign in with email and a new code.
+  - Sessions persist across app restarts (stored in the device's secure storage).
+  - Signed-out users can't reach `home`, and signing out returns to sign-in.
 
-2. Start the app
+## Planned architecture
 
-   ```bash
-   npx expo start
-   ```
+Each tool has one job:
 
-In the output, you'll find options to open the app in a
+| Concern | Tool |
+| --- | --- |
+| Auth | [Clerk](https://clerk.com) (`@clerk/expo`), custom screens |
+| Content (properties, hosts, policies, house rules) | [Sanity](https://www.sanity.io) |
+| Exact filters (price, guests, type, amenities, pets, place) | GROQ filters with params |
+| Soft intent ("quiet", "cozy", "secluded") | Sanity Dataset Embeddings, `text::semanticSimilarity()` |
+| Policy knowledge | Sanity Context endpoint (Knowledge Base mode) |
+| Typed decisions (which topics and policies answer a question) | Jev, called from API routes through the AI SDK |
+| Analytics | PostHog |
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+No LLM writes answer text: answers show the stay's own fields and policy text with their source. Prices, guest counts, and dates are parsed in code.
 
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Tech stack
 
-## Get a fresh project
+- Expo SDK 58, React Native 0.88, React 19, Expo Router (file-based routes, `Stack.Protected` guards)
+- NativeWind v5 (Tailwind CSS 4) for styling
+- TypeScript, React Compiler, typed routes
 
-When you're ready, run:
+## Getting started
+
+### 1. Install
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+### 2. Add the Satoshi fonts
 
-### Other setup steps
+The font license allows embedding in apps but not redistributing the files, so they aren't in this repo. Download Satoshi from [Fontshare](https://www.fontshare.com/fonts/satoshi) and copy these four files from `Fonts/OTF` into `assets/fonts/`:
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+```
+Satoshi-Regular.otf  Satoshi-Medium.otf  Satoshi-Bold.otf  Satoshi-Black.otf
+```
 
-## Learn more
+### 3. Set up Clerk
 
-To learn more about developing your project with Expo, look at the following resources:
+1. Create an application in the [Clerk Dashboard](https://dashboard.clerk.com).
+2. Under **User & authentication**, turn on email address with **email verification code** for sign-up and sign-in, turn passwords off, and turn on first and last name (optional).
+3. Under **Native applications**, turn on the Native API.
+4. Copy `.env.example` to `.env.local` and add your publishable key:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+   ```bash
+   EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+   ```
 
-## Join the community
+   `CLERK_SECRET_KEY` is only for future API routes and scripts. Never give a secret key the `EXPO_PUBLIC_` prefix, because those values are bundled into the app.
 
-Join our community of developers creating universal apps.
+### 4. Run
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+npx expo start
+```
+
+Then press `i` for the iOS simulator or `a` for Android, or scan the QR code with Expo Go.
+
+## Commands
+
+```bash
+npx expo install <package>  # add packages (resolves SDK-compatible versions)
+npx expo start              # dev server
+npx expo lint               # lint
+npx tsc --noEmit            # type check
+npx expo-doctor             # check dependencies and config
+```
+
+## Project structure
+
+```
+src/
+  app/            routes (screens and layouts only; keep them thin)
+    (auth)/       sign-up, verify, sign-in
+    _layout.tsx   ClerkProvider and route guards
+  screens/        each screen's own pieces
+  components/ui/  shared design-system components
+  lib/auth/       Clerk error helpers
+  theme/          values JS props need (icon tints, motion)
+  global.css      design tokens (@theme)
+assets/images/    design references (roam-*.png) and app icons
+prompts/          feature plans, one per feature, in build order
+AGENTS.md         project rules and decisions for AI coding agents
+```
+
+## Built with AI agents
+
+This app is built with AI coding agents working from [`AGENTS.md`](AGENTS.md). For each feature, the agent reads the code and current docs, writes a plan in [`prompts/`](prompts), waits for approval, builds it, and verifies it. The plans in `prompts/` are the history of how the app came together.

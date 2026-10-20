@@ -1,9 +1,125 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+
+@import "nativewind/theme";
+
+/*
+ * Roam design tokens. Source of truth: assets/images/roam-design.png.
+ * Values are px so nothing depends on rem conversion on native, except line heights:
+ * those are unitless ratios, because native multiplies a var-resolved line height by the font size.
+ * src/theme/ mirrors the values JS needs; keep the two in sync.
+ */
+@theme {
+  --color-primary: #ffc629;
+  --color-primary-pressed: #f2b200;
+  --color-lavender: #c9b4ff;
+  --color-lavender-soft: #f0ecff;
+  --color-violet: #5f31f8;
+  --color-ink: #0b0b1a;
+  --color-ink-secondary: #6b7280;
+  --color-ink-muted: #a0a4ae;
+  --color-surface: #ffffff;
+  --color-surface-gray: #f4f5f7;
+  --color-line: #e5e7eb;
+  --color-glass: rgba(255, 255, 255, 0.7);
+  --color-overlay: rgba(11, 11, 26, 0.55);
+  --color-glass-line: rgba(255, 255, 255, 0.4);
+  --color-star: #fdb805;
+  --color-success: #0e7a4a;
+  --color-success-soft: #dff1ea;
+  --color-danger: #dd3a4d;
+  --color-danger-soft: #fddfe8;
+  --color-info: #2c4fb2;
+  --color-info-soft: #eaf0fd;
+  --color-promo: #d6336c;
+  --color-promo-soft: #fee7f0;
+  --color-favorite-soft: #fef5dc;
+
+  /* One family per weight: font-bold only sets fontWeight on native. */
+  --font-satoshi: "Satoshi-Regular";
+  --font-satoshi-medium: "Satoshi-Medium";
+  --font-satoshi-bold: "Satoshi-Bold";
+  --font-satoshi-black: "Satoshi-Black";
+
+  --text-display: 56px;
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: -1.5px;
+  --text-hero: 38px;
+  --text-hero--line-height: 1.05;
+  --text-hero--letter-spacing: -1px;
+  --text-heading: 30px;
+  --text-heading--line-height: 1.2;
+  --text-heading--letter-spacing: -0.6px;
+  --text-title: 20px;
+  --text-title--line-height: 1.25;
+  --text-title--letter-spacing: -0.2px;
+  --text-body: 16px;
+  --text-body--line-height: 1.5;
+  --text-caption: 14px;
+  --text-caption--line-height: 1.4286;
+  --text-label: 12px;
+  --text-label--line-height: 1.3333;
+  --text-button: 17px;
+  --text-button--line-height: 1.1765;
+  --text-wordmark: 48px;
+  --text-wordmark--line-height: 1;
+  --text-wordmark--letter-spacing: -2px;
+  --text-wordmark-lg: 72px;
+  --text-wordmark-lg--line-height: 1;
+  --text-wordmark-lg--letter-spacing: -3px;
+  --text-wordmark-sm: 28px;
+  --text-wordmark-sm--line-height: 1;
+  --text-wordmark-sm--letter-spacing: -1px;
+
+  --spacing: 4px;
+  --spacing-gutter: 24px;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-3xl: 32px;
+}
+
 :root {
-  --font-display:
-    Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
-    Segoe UI Symbol, Noto Color Emoji;
-  --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
-  --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
-  --font-serif: Georgia, 'Times New Roman', serif;
+  --color-primary: #ffc629;
+  --color-primary-pressed: #f2b200;
+  --color-lavender: #c9b4ff;
+  --color-lavender-soft: #f0ecff;
+  --color-violet: #5f31f8;
+  --color-ink: #0b0b1a;
+  --color-ink-secondary: #6b7280;
+  --color-ink-muted: #a0a4ae;
+  --color-surface: #ffffff;
+  --color-surface-gray: #f4f5f7;
+  --color-line: #e5e7eb;
+  --color-glass: rgba(255, 255, 255, 0.7);
+  --color-overlay: rgba(11, 11, 26, 0.55);
+  --color-glass-line: rgba(255, 255, 255, 0.4);
+  --color-star: #fdb805;
+  --color-success: #0e7a4a;
+  --color-success-soft: #dff1ea;
+  --color-danger: #dd3a4d;
+  --color-danger-soft: #fddfe8;
+  --color-info: #2c4fb2;
+  --color-info-soft: #eaf0fd;
+  --color-promo: #d6336c;
+  --color-promo-soft: #fee7f0;
+  --color-favorite-soft: #fef5dc;
+}
+
+@utility shadow-card {
+  box-shadow:
+    0 1px 2px rgba(11, 11, 26, 0.04),
+    0 4px 16px rgba(11, 11, 26, 0.06);
+}
+
+@utility shadow-raised {
+  box-shadow: 0 8px 24px rgba(11, 11, 26, 0.12);
+}
+
+@utility shadow-floating {
+  box-shadow: 0 12px 32px rgba(11, 11, 26, 0.16);
 }
